@@ -73,26 +73,11 @@ mcp/
 ├── logs/                           학생 실행 로그 (.gitkeep만 커밋)
 │   └── .gitkeep
 │
-├── instructor/                     [강사용 — 학생에게 지급하지 않음]
-│   ├── plan.md                     과정 설계서
-│   ├── prompt.md                   index.html 생성 프롬프트
-│   ├── HANDOFF.md                  다른 LLM·작업자에게 넘기는 인수인계 문서
-│   ├── tools/                      SVG 슬라이드 생성 스크립트 (svglib.py, gen_*.py)
-│   ├── 00_intro/GUIDE.md           단계별 슬라이드 가이드
-│   ├── 01_basic/GUIDE.md
-│   ├── 02_filesystem/GUIDE.md
-│   ├── 03_postgres/GUIDE.md
-│   ├── 99_ref/GUIDE.md
-│   └── _template/                  과정 생성 템플릿 (README·checklists·prompts·spec·templates)
-│
 ├── index.html                      SVG 슬라이드 인덱스 + 발표 모드
 ├── readme.md
-├── .env.example                    환경변수 템플릿 (.env는 직접 생성, 커밋·배포 제외)
-├── .gitignore
-└── .distignore                     학생 배포 제외 목록
+├── .env.example                    환경변수 템플릿 (.env는 직접 생성, 커밋 제외)
+└── .gitignore
 ```
-
-> 현재 완성: 01·02·03 단계의 `.py`, 전 단계(00·01·02·03·99) 슬라이드, `index.html`(5단계 31장 수록).
 
 ## 슬라이드 발표
 
@@ -179,12 +164,6 @@ psql -d postgres -f 03_postgres/setup.sql    # orders 테이블 + 읽기 전용 
 | `01_basic` | `[구분, status, elapsed_ms]` (기준) |
 | `02_filesystem` | `+ [입력, output]` — 허용 경로 `ok` / 경로 밖 `denied` |
 | `03_postgres` | `+ [sql]` — SELECT `ok` / DROP `denied` 또는 `error` |
-
-## 배포 규칙
-
-- `instructor/` 폴더 전체는 학생에게 지급하지 않는다 (`.distignore` 참고).
-- 단계 폴더는 수업 단위이자 **독립 프로젝트**다 — 어떤 폴더든 단독으로 떼어 줘도 `main.py`로 완결 실행된다.
-- 코드 공유는 `shared/` 디렉터리 대신 vendoring으로 해결한다. `logs/`는 코드가 아니라 학생 실행 로그 보관소다.
 
 ## DeepSeek API 사용 (환경변수)
 
