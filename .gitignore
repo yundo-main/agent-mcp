@@ -1,0 +1,22 @@
+# API 키·DB 연결 문자열 (절대 커밋하지 않는다)
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 실행 로그 (폴더는 유지, 내용만 제외)
+logs/*
+!logs/.gitkeep
+
+# OS / 에디터
+.DS_Store
+.idea/
+.vscode/
+
+# 강사용 파일: 학생에게 공개되는 저장소라면 아래 줄을 유지 (git에도 올리지 않음)
+instructor/

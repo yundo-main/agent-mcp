@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>MCP 실습 SVG 슬라이드 인덱스</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f8fafc; --panel: #ffffff; --ink: #122033; --muted: #516174; --line: #c9d5e1; --accent: #1769aa;
+    --font: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { color-scheme: light; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); line-height: 1.5; }
+  main { max-width: 1200px; margin: 0 auto; padding: 32px 20px 48px; }
+  header .eyebrow { margin: 0 0 6px; font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--accent); }
+  header h1 { margin: 0 0 8px; font-size: 32px; line-height: 1.25; }
+  header p.sub { margin: 0; color: var(--muted); font-size: 17px; }
+  nav.quick { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0 20px; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border: 1px solid var(--line); border-radius: 8px;
+         background: var(--panel); color: var(--ink); font: 600 15px var(--font); text-decoration: none; cursor: pointer; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { filter: brightness(1.08); color: #fff; }
+  .btn.small { padding: 4px 12px; font-size: 13px; }
+  details { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; margin: 0 0 16px; }
+  summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; cursor: pointer;
+            font-size: 18px; font-weight: 700; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary .title::before { content: '▸'; display: inline-block; width: 1.1em; color: var(--accent); transition: transform .15s; }
+  details[open] summary .title::before { transform: rotate(90deg); }
+  summary .count { margin-left: 8px; font-size: 13px; font-weight: 400; color: var(--muted); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; padding: 4px 18px 18px; }
+  .card { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
+  .thumb { display: block; aspect-ratio: 16 / 9; background: #fff; border-bottom: 1px solid var(--line); cursor: pointer; }
+  .thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .card .body { padding: 10px 12px 12px; }
+  .card h3 { margin: 0 0 2px; font-size: 15px; }
+  .card p { margin: 0 0 8px; font-size: 12px; color: var(--muted); word-break: break-all; }
+  .card .body a { margin-right: 12px; font-size: 13px; color: var(--accent); text-decoration: none; font-weight: 600; }
+  .card .body a:hover { text-decoration: underline; }
+  footer.guide { margin-top: 28px; padding: 14px 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; color: var(--muted); font-size: 14px; }
+  footer.guide code { font-family: ui-monospace, Menlo, 'SF Mono', monospace; background: var(--bg); padding: 1px 6px; border-radius: 4px; color: var(--ink); }
+
+  /* 발표(프리젠터) 오버레이 */
+  #presenter { position: fixed; inset: 0; z-index: 100; display: none; flex-direction: column; background: #0b1420; color: #e8eef5; }
+  #presenter.open { display: flex; }
+  #presenter .progress { height: 4px; background: #24344a; flex: none; }
+  #presenter .progress > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+  #presenter .stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 12px; user-select: none; touch-action: pan-y; }
+  #presenter .stage img { max-width: 100%; max-height: 100%; width: 100%; height: 100%; object-fit: contain; background: #f8fafc; border-radius: 4px; }
+  #presenter .bar { flex: none; display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #122033; border-top: 1px solid #24344a; }
+  #presenter .bar .cap { flex: 1; min-width: 0; text-align: center; font-size: 14px; color: #c9d5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #presenter .bar button { background: #1b2d44; color: #e8eef5; border: 1px solid #34496a; border-radius: 6px; padding: 6px 14px; font: 600 14px var(--font); cursor: pointer; }
+  #presenter .bar button:hover { border-color: #6fb1e6; }
+  #presenter .bar button:disabled { opacity: .4; cursor: default; }
+  body.presenting { overflow: hidden; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">MCP · SVG INDEX</p>
+    <h1>MCP 실습 SVG 슬라이드 인덱스</h1>
+    <p class="sub">에이전트에 손과 발 달아주기 — 외부 세계와의 표준 연결 인터페이스</p>
+  </header>
+
+  <nav class="quick">
+    <button class="btn primary" id="present-all" type="button">▶ 전체 발표</button>
+    <a class="btn" href="readme.md" target="_blank">readme.md</a>
+  </nav>
+
+  <details id="sec-00_intro" open>
+    <summary><span class="title">00 도입 · 개요<span class="count" data-count="00_intro"></span></span><button class="btn small" type="button" data-present="00_intro">▶ 발표</button></summary>
+    <div class="grid" id="grid-00_intro"></div>
+  </details>
+
+  <details id="sec-01_basic" open>
+    <summary><span class="title">01 기본 · 3대 기둥과 최소 서버<span class="count" data-count="01_basic"></span></span><button class="btn small" type="button" data-present="01_basic">▶ 발표</button></summary>
+    <div class="grid" id="grid-01_basic"></div>
+  </details>
+
+  <details id="sec-02_filesystem">
+    <summary><span class="title">02 파일시스템 · 오픈 소스 서버 연결<span class="count" data-count="02_filesystem"></span></span><button class="btn small" type="button" data-present="02_filesystem">▶ 발표</button></summary>
+    <div class="grid" id="grid-02_filesystem"></div>
+  </details>
+
+  <details id="sec-03_postgres">
+    <summary><span class="title">03 Postgres · SQL 조회와 안전 실험<span class="count" data-count="03_postgres"></span></span><button class="btn small" type="button" data-present="03_postgres">▶ 발표</button></summary>
+    <div class="grid" id="grid-03_postgres"></div>
+  </details>
+
+  <details id="sec-99_ref">
+    <summary><span class="title">99 참고 · 보안과 확장<span class="count" data-count="99_ref"></span></span><button class="btn small" type="button" data-present="99_ref">▶ 발표</button></summary>
+    <div class="grid" id="grid-99_ref"></div>
+  </details>
+
+  <footer class="guide">
+    로컬 서버로 열기: <code>python3 -m http.server 8000</code> → <code>http://127.0.0.1:8000/index.html</code>
+  </footer>
+</main>
+
+<div id="presenter" role="dialog" aria-label="슬라이드 발표" aria-hidden="true">
+  <div class="progress"><i id="pz-progress"></i></div>
+  <div class="stage" id="pz-stage"><img id="pz-img" alt=""></div>
+  <div class="bar">
+    <button type="button" id="pz-prev">◀ 이전</button>
+    <button type="button" id="pz-next">다음 ▶</button>
+    <span class="cap" id="pz-cap"></span>
+    <button type="button" id="pz-full">전체화면</button>
+    <button type="button" id="pz-close">닫기</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  var slides = [];          // 전체 발표 순서 = draw() 호출 순서
+  var scope = [];           // 현재 발표 범위
+  var idx = 0;
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+  function draw(dir, files, group) {
+    var grid = document.getElementById('grid-' + dir);
+    var count = document.querySelector('[data-count="' + dir + '"]');
+    if (count) count.textContent = files.length + '장';
+    files.forEach(function (file, i) {
+      var path = dir + '/slides/' + file;
+      var no = pad(i + 1);
+      var title = group + ' · ' + no;
+      slides.push({ dir: dir, path: path, file: file, title: title });
+      var card = document.createElement('article');
+      card.className = 'card';
+      card.innerHTML =
+        '<a class="thumb" href="' + path + '" target="_blank" data-open="' + path + '">' +
+          '<img loading="lazy" src="' + path + '" alt="' + title + ' ' + file + '">' +
+        '</a>' +
+        '<div class="body">' +
+          '<h3>' + title + '</h3>' +
+          '<p>' + file + '</p>' +
+          '<a href="' + path + '" target="_blank">SVG 열기</a>' +
+          '<a href="' + path + '" download>다운로드</a>' +
+        '</div>';
+      grid.appendChild(card);
+    });
+  }
+
+  draw('00_intro',
+    ['s01-nm-problem.svg', 's02-usb-c-analogy.svg', 's03-host-client-server.svg',
+     's04-course-flow.svg'], '개요');
+
+  draw('01_basic',
+    ['s01-three-pillars.svg', 's02-who-controls.svg', 's03-handshake-flow.svg',
+     's04-server-code.svg', 's05-client-code.svg', 's06-file-map.svg',
+     's07-run-example.svg', 's08-review-questions.svg', 's09-review-answers.svg'], '기본');
+
+  draw('02_filesystem',
+    ['s01-open-source-server.svg', 's02-schema-mapping.svg', 's03-agent-loop.svg',
+     's04-allowed-directory.svg', 's05-boundary-test.svg', 's06-review-questions.svg',
+     's07-review-answers.svg'], '파일시스템');
+
+  draw('03_postgres',
+    ['s01-schema-discovery-tools.svg', 's02-text-to-sql-flow.svg', 's03-readonly-account.svg',
+     's04-drop-denied.svg', 's05-review-questions.svg', 's06-review-answers.svg'], 'Postgres');
+
+  draw('99_ref',
+    ['s01-trust-boundary.svg', 's02-injection-and-hitl.svg', 's03-transport-choice.svg',
+     's04-spec-sdk-inspector.svg', 's05-cheat-sheet.svg'], '참고');
+
+  /* ---------- 발표 모드 ---------- */
+  var pz = document.getElementById('presenter');
+  var img = document.getElementById('pz-img');
+  var cap = document.getElementById('pz-cap');
+  var bar = document.getElementById('pz-progress');
+  var stage = document.getElementById('pz-stage');
+  var btnPrev = document.getElementById('pz-prev');
+  var btnNext = document.getElementById('pz-next');
+
+  function isOpen() { return pz.classList.contains('open'); }
+
+  function preload(i) {
+    if (i >= 0 && i < scope.length) { var p = new Image(); p.src = scope[i].path; }
+  }
+
+  function show(i) {
+    idx = Math.max(0, Math.min(scope.length - 1, i));
+    var s = scope[idx];
+    img.src = s.path;
+    img.alt = s.title;
+    cap.textContent = (idx + 1) + ' / ' + scope.length + ' · ' + s.title + ' · ' + s.file;
+    bar.style.width = ((idx + 1) / scope.length * 100) + '%';
+    btnPrev.disabled = idx === 0;
+    btnNext.disabled = idx === scope.length - 1;
+    preload(idx + 1);
+    preload(idx - 1);
+  }
+
+  function openPresenter(dir, startPath) {
+    scope = dir ? slides.filter(function (s) { return s.dir === dir; }) : slides.slice();
+    if (!scope.length) return;
+    var start = 0;
+    if (startPath) {
+      scope.forEach(function (s, i) { if (s.path === startPath) start = i; });
+    }
+    pz.classList.add('open');
+    pz.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('presenting');
+    show(start);
+  }
+
+  function closePresenter() {
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
+    pz.classList.remove('open');
+    pz.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('presenting');
+  }
+
+  function toggleFullscreen() {
+    if (document.fullscreenElement) { document.exitFullscreen(); }
+    else if (pz.requestFullscreen) { pz.requestFullscreen(); }
+  }
+
+  document.getElementById('present-all').addEventListener('click', function () { openPresenter(null); });
+
+  document.querySelectorAll('[data-present]').forEach(function (b) {
+    b.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      openPresenter(b.getAttribute('data-present'));
+    });
+  });
+
+  document.querySelectorAll('a.thumb').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      var path = a.getAttribute('data-open');
+      var s = slides.filter(function (x) { return x.path === path; })[0];
+      openPresenter(s ? s.dir : null, path);
+    });
+  });
+
+  btnPrev.addEventListener('click', function () { show(idx - 1); });
+  btnNext.addEventListener('click', function () { show(idx + 1); });
+  document.getElementById('pz-full').addEventListener('click', toggleFullscreen);
+  document.getElementById('pz-close').addEventListener('click', closePresenter);
+
+  stage.addEventListener('click', function (e) {
+    var r = stage.getBoundingClientRect();
+    if ((e.clientX - r.left) < r.width * 0.3) show(idx - 1); else show(idx + 1);
+  });
+
+  var touchX = null;
+  stage.addEventListener('touchstart', function (e) { touchX = e.changedTouches[0].clientX; }, { passive: true });
+  stage.addEventListener('touchend', function (e) {
+    if (touchX === null) return;
+    var dx = e.changedTouches[0].clientX - touchX;
+    touchX = null;
+    if (Math.abs(dx) >= 50) { e.preventDefault(); show(idx + (dx < 0 ? 1 : -1)); }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (!isOpen()) return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); show(idx + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); show(idx - 1); }
+    else if (k === 'Home') { e.preventDefault(); show(0); }
+    else if (k === 'End') { e.preventDefault(); show(scope.length - 1); }
+    else if (k === 'f' || k === 'F') { e.preventDefault(); toggleFullscreen(); }
+    else if (k === 'Escape') { e.preventDefault(); closePresenter(); }
+  });
+})();
+</script>
+</body>
+</html>
