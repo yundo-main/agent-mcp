@@ -97,10 +97,16 @@ mcp/
 brew install postgresql@16
 brew services start postgresql@16            # 이미 쓰는 Postgres가 있으면 생략하고 그 DB를 사용
 export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
-psql -d postgres -f 03_postgres/setup.sql    # orders 테이블 + 읽기 전용 롤 app_ro 생성
+lsof -nP -iTCP:5432 -sTCP:LISTEN             # 5432 수신 확인 — 아무것도 안 나오면 아직 기동 중이니 몇 초 뒤 재시도
+psql -d postgres -f 03_postgres/setup.sql    # 슈퍼유저로 1회 실행: orders 테이블 + 읽기 전용 롤 app_ro 생성
+psql "postgresql://app_ro:app_ro_pw@localhost:5432/postgres" -c "SELECT count(*) FROM orders;"   # 5건 예상
 # .env 에 DATABASE_URI=postgresql://app_ro:app_ro_pw@localhost:5432/postgres
 # 정리: psql -d postgres -c "DROP TABLE orders; DROP OWNED BY app_ro; DROP ROLE app_ro;" && brew services stop postgresql@16
 ```
+
+- 마지막 `SELECT count(*)`가 `5`로 나와야 03 단계가 정상 동작한다. `connection refused`면 서버가 안 떠 있는 것(`brew services list`로 확인), `role "app_ro" does not exist`면 `setup.sql`을 실행하지 않은 것이다.
+- `psql`을 찾지 못하면 같은 터미널에서 `export PATH=...` 줄을 먼저 실행했는지 확인한다(새 터미널을 열면 다시 필요).
+- `setup.sql`은 여러 번 실행해도 5건을 유지한다.
 
 다른 OS는 해당 OS의 PostgreSQL을 설치한 뒤 같은 `psql -f`와 `DATABASE_URI`를 쓰면 된다. 이미 쓰는 Postgres가 있다면 `setup.sql`이 `orders` 테이블과 `app_ro` 롤을 만든다는 점을 확인하고 적용한다.
 
