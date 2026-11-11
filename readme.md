@@ -55,6 +55,7 @@ mcp/
 │   ├── setup.sql                   샘플 orders 테이블 + 읽기 전용 롤 app_ro
 │   ├── overrides.txt               uvx 의존성 대체 (pglast==7.22 — PyPI에 7.2.0이 없음)
 │   └── slides/
+│       ├── s00-db-setup.svg
 │       ├── s01-schema-discovery-tools.svg
 │       ├── s02-text-to-sql-flow.svg
 │       ├── s03-readonly-account.svg
